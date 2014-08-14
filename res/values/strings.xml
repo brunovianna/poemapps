@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">PoemApps</string>
+    <string name="about">Gab Marcondes + Bruno Vianna</string>
+	<string-array name="doublets_array">
+		<item>bom</item>
+		<item>6</item>
+		<item>mau</item>
+		<item>fogo</item>
+		<item>6</item>
+		<item>gelo</item>
+		<item>nada</item>
+		<item>8</item>
+		<item>tudo</item>
+		<item>longe</item>
+		<item>7</item>
+		<item>perto</item>
+		<item>nada</item>
+		<item>8</item>
+		<item>tudo</item>
+		<item>céu</item>
+		<item>7</item>
+		<item>mar</item>
+		<item>deus</item>
+		<item>6</item>
+		<item>caos</item>
+		<item>manhã</item>
+		<item>8</item>
+		<item>tarde</item>
+		<item>tarde</item>
+		<item>8</item>
+		<item>noite</item>
+		<item>sol</item>
+		<item>3</item>
+		<item>lua</item>
+		<item>mente</item>
+		<item>10</item>
+		<item>corpo</item>
+		</string-array>
+	<string name="action_settings">wot</string>
+	<string name="button_doublet_jogo">poema jogo</string>
+	<string name="button_doublet_livre">poema livre</string>
+	<string name="button_doublet_win">doublet completo!</string>
+	<string name="button_doublet_novo">jogue outro doublet</string>
+	<string name="button_doublet_novamente">tente novamente</string>
+	<string name="notificacao_perdeu">instruções blabla lba</string>
+    <string name="instrucoes_doublet">instruções blabla lba</string>
+    
+</resources>
