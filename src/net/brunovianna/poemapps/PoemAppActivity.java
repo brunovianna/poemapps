@@ -1,7 +1,10 @@
 package net.brunovianna.poemapps;
 
+import net.brunovianna.poemapps.cidade.*;
 import net.brunovianna.poemapps.doublet.DoubletSplashActivity;
-import net.brunovianna.poemapps.pendulum.*;
+import net.brunovianna.poemapps.rgb.*;
+import net.brunovianna.poemapps.bussola.*;
+import net.brunovianna.poemapps.sopro.*;
 
 
 import android.app.Activity;
@@ -37,16 +40,20 @@ public class PoemAppActivity extends ListActivity {
     	    	intent = new Intent (PoemAppActivity.this, DoubletSplashActivity.class);
     	        startActivity(intent);
     	        break;
-        	case(1): //significante
-    	    	intent = new Intent (PoemAppActivity.this, DoubletSplashActivity.class);
+        	case(1): //cidade
+    	    	intent = new Intent (PoemAppActivity.this, CidadeActivity.class);
     	        startActivity(intent);
     	        break;
-        	case(2): //saudeus
-		    	intent = new Intent (PoemAppActivity.this, DoubletSplashActivity.class);
+        	case(2): //rgb
+		    	intent = new Intent (PoemAppActivity.this, Rgb.class);
 		        startActivity(intent);
 		        break;
-        	case(3): //pendulo
-		    	intent = new Intent (PoemAppActivity.this, PoemPendulum.class);
+        	case(3): //oriente
+		    	intent = new Intent (PoemAppActivity.this, Bussola.class);
+		        startActivity(intent);
+		        break;
+        	case(6): //sopro
+		    	intent = new Intent (PoemAppActivity.this, Sopro.class);
 		        startActivity(intent);
 		        break;
         	
@@ -57,6 +64,6 @@ public class PoemAppActivity extends ListActivity {
       });
     }
 	
-	static final String[] POEMAS = new String[] {"Doublet", "Significante", "Saudades", "Pêndulo"};
+	static final String[] POEMAS = new String[] {"Doublets", "Pela cidade", "Poema em RGB", "Oriente", "Sinuca", "Réu Lógico", "Sopro"};
 
 }
