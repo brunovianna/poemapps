@@ -64,6 +64,7 @@ public class DoubletJogoActivity extends PApplet {
 
 		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 		currentDoublet = settings.getInt("currentDoublet", 0);
+
 		
 		preparePoem();
 
@@ -113,7 +114,7 @@ public class DoubletJogoActivity extends PApplet {
 			}
 
 			//se já estivermos no limite de palavras, cheque se ganhou o jogo
-			if (indexLinha == doublets.get(currentDoublet).comprimento - 1 ) {
+			if (indexLinha == doublets.get(currentDoublet).comprimento - 2 ) {
 				
 				// caso haja alguma palavra que sirva...
 				if (possiveis.size() != 0) {
@@ -286,6 +287,9 @@ public class DoubletJogoActivity extends PApplet {
 			doublets.add(d);
 		}
 
+		if (currentDoublet == doublets.size()) currentDoublet = 0;
+
+		
 		String words[] = loadStrings("br.txt");
 
 		for (int i=0;i<words.length;i++)
@@ -330,7 +334,7 @@ public class DoubletJogoActivity extends PApplet {
 				indexLinha = 0;
 				SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 				currentDoublet = settings.getInt("currentDoublet", 0);
-				if (currentDoublet < doublets.size())
+				if (currentDoublet < doublets.size()-1)
 					currentDoublet++;
 				else 
 					currentDoublet = 0;

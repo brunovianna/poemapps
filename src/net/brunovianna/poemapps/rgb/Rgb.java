@@ -12,28 +12,29 @@ public class Rgb extends PApplet {
 
 PFont droidFont;
 PGraphics r, b;
+PImage roda, texto;
 boolean dragging, draggingRed;
-int downX, downY, rectWidth, rectHeight;
+int downX, downY, halfWidth, halfHeight;
+
+double angle = 0;
+
+PGraphics buf; 
 
 public void setup() {
   //size(100,100);
   //droidFont = createFont("DroidSans", 32, true);
-  droidFont = loadFont("DroidSans-32.vlw");
-  textFont(droidFont);
-  textAlign (LEFT, CENTER);
+	
+	texto = loadImage("rgb-texto.png");
+	roda = loadImage("rgb-roda.png");
+
+	buf = createGraphics(roda.height*2,roda.width*2,JAVA2D);
+
+	
   background(255);
-  rectWidth = width/2;
-  rectHeight = height/5;
-  r = createGraphics(rectWidth,rectHeight);
-  r.beginDraw();
-  r.background(204,0,0);
-  r.endDraw();
-  b = createGraphics(rectWidth,rectHeight);
-  b.beginDraw();
-  b.background(51,255,255);
-  b.endDraw();
-  image (r, 0,0);
-  image (b,width/2,0);
+  halfWidth = width/2;
+  halfHeight = height/2;
+  //image (r, 0,0);
+  //image (b,width/2,0);
   dragging = false;
   draggingRed = false;
 }
@@ -41,7 +42,45 @@ public void setup() {
 public void draw () {
   //blendMode();
   background(255);
-  if (!dragging)  {
+  
+	float proporcao = (float) ((float)displayWidth / (float)roda.width);
+	
+	if (dragging) {
+		
+		angle = dist (mouseX, mouseY, downX, downY) / 600.0f * 2.0f * Math.PI;
+		
+	}
+	
+	
+	//image (fora, (displayWidth-fora.width)/2, (displayHeight- fora.height)/2, displayWidth, displayWidth);
+	image (texto, 0, halfHeight-texto.height*proporcao/2, displayWidth, texto.height*proporcao);
+
+	
+	buf.beginDraw();
+	buf.imageMode(CENTER);
+	buf.pushMatrix();
+	buf.translate(roda.width/2,roda.height/2);
+	buf.rotate((float) angle);
+	buf.image(roda,0,0);
+	buf.popMatrix();
+	buf.endDraw();
+	
+	/*
+	pushMatrix();
+	translate (halfWidth, halfHeight);
+	rotate((float) angle);
+
+	translate (-halfWidth, -halfHeight);
+
+	float largura = texto.width * proporcao;
+	float altura = texto.height * proporcao;
+	*/
+    blend (buf,0,0,roda.width,roda.height,0,(int)(halfHeight-texto.height*proporcao/2),(int) displayWidth, (int)(texto.height*proporcao),SUBTRACT);
+	//image (roda, (displayWidth-largura)/2, (displayHeight- altura)/2, largura, altura);
+	//popMatrix();
+
+	/*
+  	if (!dragging)  {
     image (r, 0,0);
     image (b,width/2,0);
   } else {
@@ -63,21 +102,15 @@ public void draw () {
   text ("texto vermelho", width/3,height/3*2);
   //blendMode(ADD);
   //blend (r,0,0,150,150,mouseX,mouseY,150,150,SUBTRACT);
+  */
 }
 
 public void mousePressed() {
   
-  if (mouseY < rectHeight) { //clicked on the drag area
     dragging = true;
     downX = mouseX;
     downY = mouseY;
-    if (mouseX < rectWidth) { //clicked on red
-      draggingRed = false;
-      println ("< 100");
-    } else {
-      draggingRed = true;
-    }
-  } 
+
 
   
 }
