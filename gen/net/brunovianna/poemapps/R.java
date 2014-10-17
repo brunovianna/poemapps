@@ -10,6 +10,10 @@ package net.brunovianna.poemapps;
 public final class R {
     public static final class array {
         public static final int doublets_array=0x7f060000;
+        public static final int sopro_fases=0x7f060002;
+        /**   sopro 
+         */
+        public static final int sopro_texto=0x7f060001;
     }
     public static final class attr {
     }
