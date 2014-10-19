@@ -11,12 +11,6 @@ import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 
-
-import fisica.*;
-import geomerative.*;
-import org.apache.batik.svggen.font.table.*;
-import org.apache.batik.svggen.font.*;
-
 import java.util.*;
 
 import processing.core.*;
@@ -26,10 +20,8 @@ public class Sopro extends PApplet {
 
 	//Resources res;
 
-	FWorld world;
+	ArrayList<FChar> world;
 	double sopro = 0;
-	RFont rFont;
-	PFont pFont;
 
 	StringList frase;
 	int[] fases;
@@ -43,37 +35,29 @@ public class Sopro extends PApplet {
 	public static final int SAMPLE_RATE = 16000;
 	private AudioRecord mRecorder;
 	private short[] mBuffer;
-
+	int sound_counter = 0;
+	int sound_sum;
+	boolean measuring_sound = true;
+	float sound_threshold = 0;
+	int millis;
+	
 	public void setup() {
-		size(640, 480);
 		smooth();
-
-		frameRate(60);
-
-		Fisica.init(this);
-		Fisica.setScale(4);
-		RG.init(this);
-
-		RG.setPolygonizer(RG.ADAPTATIVE);
-
-		world = new FWorld();
-		world.setGravity(0, 0);
-		//world.setEdges(this, color(255));
-		//world.remove(world.top);
+		fill(200);
 		
-		
-		
+		world = new ArrayList<FChar> ();
+				
 		Resources res = getResources();
 		CharSequence[] sopro_texto = res.getTextArray(R.array.sopro_texto);
 		CharSequence[] sopro_fases = res.getTextArray(R.array.sopro_fases);
 		
 		frase = new StringList();
 		
-		//for (int i=0; i<sopro_texto.length;i++) {
-			//frase.append (sopro_texto[i].toString());
-		//}
+		for (int i=0; i<sopro_texto.length;i++) {
+			frase.append (sopro_texto[i].toString());
+		}
 		
-		frase.append("guelra palavra");
+		//frase.append("guelra palavra");
 		/*frase.append("dentro dela o ar");
 		  frase.append("entrando e saindo");
 		  frase.append("expirar inspirar");
@@ -103,8 +87,7 @@ public class Sopro extends PApplet {
 
 		String stringFont = "LiberationSerif-Bold";
 
-		rFont = RG.loadFont(stringFont+".ttf");
-		pFont = loadFont(stringFont+".vlw");
+		PFont pFont = loadFont(stringFont+".vlw");
 		textFont (pFont);
 
 		//posicionando o texto
@@ -115,7 +98,7 @@ public class Sopro extends PApplet {
 		}
 
 
-		int fsize = (int)(width*0.8f/maxWidth);
+		int fsize = (int)(width*2.0f/maxWidth);
 		textSize(fsize);
 
 		int pos_Y = (int) (height*0.2f);
@@ -124,18 +107,17 @@ public class Sopro extends PApplet {
 
 
 		for (int i=0; i<frase.size();i++) {
-			int start_X = (int)(width/2 - textWidth(frase.get(i)));
+			int start_X = (int)(width/2 - textWidth(frase.get(i))/2);
 			for (int j=0;j<frase.get(i).length();j++) {
 				if (frase.get(i).charAt(j) != ' ') {
-					FChar chr = new FChar(frase.get(i).charAt(j), fsize, 0);
+					float pos_X =  textWidth(frase.get(i).substring( 0, j));
+					float mass = 1.0f + random (100)/1000.0f;
+					float friction = 0.9f;
+					FChar chr = new FChar(frase.get(i).charAt(j), fsize, start_X+ pos_X, pos_Y, mass, friction);
 					println (frase.get(i).charAt(j));
 
-					if (chr.bodyCreated()) {
-						float pos_X =  textWidth(frase.get(i).substring( 0, j));
-						chr.setPosition(start_X+pos_X, pos_Y);
 
-						world.add(chr);
-					}
+					world.add(chr);
 				}
 			}
 			pos_Y += stepY;
@@ -144,40 +126,60 @@ public class Sopro extends PApplet {
 
 
 		initRecorder();
-	}
-
-	public	void draw() {
-		background(50);
-		fill(0);
-		stroke(0);
-		world.draw(this);
-		world.step();
-
-		if (sopro > 1.0f) {
-			Iterator itr = world.getBodies().iterator();
-			while (itr.hasNext()) {
-				//vetor unitario
-				FBody body = (FBody) itr.next();
-
-				// sopro vem do meio de baixo
-				float ux = body.getX() - width/2;
-				float uy = body.getY() - height;
-
-				float uvector = dist (0,0,ux,uy);
-
-				body.setForce((float)((ux/uvector)*sopro),(float)((uy/uvector)*sopro));
-			}
-		}
-		
 
 		mRecorder.startRecording();
 		//mRecording = getFile("raw");
 		startBufferedWrite();
+
+		millis = millis();
+	}
+
+	public	void draw() {
+		
+		if (measuring_sound) {
+			sound_counter++;
+			sound_sum += sopro;
+			if (millis + 1000 < millis()) {
+				sound_threshold = (sound_sum/sound_counter) * 2.0f;
+				if (sound_threshold > 100000.0f)
+					sound_threshold = 100000.0f;
+				measuring_sound = false;
+			}
+				
+		} else {
+		
+		
+		background(50);
+		fill(200);
+		stroke(0);
+
+		
+		Iterator itr = world.iterator();
+		while (itr.hasNext()) {
+			FChar chr = (FChar) itr.next();
+			if (sopro > sound_threshold) {
+				//vetor unitario
+				
+				// sopro vem do meio de baixo
+				float ux = chr.m_X - width/2;
+				float uy = chr.m_Y - height;
+
+				float uvector = dist (0,0,ux,uy);
+
+				chr.setForce((float)((ux/uvector)*(sopro/sound_threshold)*0.00001f),(float)((uy/uvector)*(sopro/sound_threshold)*0.00001f));
+			}
+			
+			chr.draw();
+		}
+		}
+
 	}
 
 	public void keyPressed() {  
 
-		if (key == CODED) {
+		/*
+		  if (key == CODED) {
+		 
 			if (keyCode == UP) {
 				sopro += 5.0f;
 				println (sopro);
@@ -204,71 +206,54 @@ public class Sopro extends PApplet {
 				}
 			}
 		}
+		  */
 	}
 
-	class FChar extends FPoly {
-		RShape m_shape;
-		RShape m_poly;
-		boolean m_bodyCreated;
+	class FChar {
+
 		public int m_fase;
-
-		FChar(char chr, int fsize, int p_fase){
-			super();
-
-			String txt = "";
-			txt += chr;
+		public char m_char;
+		float m_friction, m_accelX, m_accelY;
+		float m_X, m_Y, m_velX, m_velY, m_forceX, m_forceY, m_mass;
+		boolean m_static;
+		
+		FChar(char chr, int p_fase, float x, float y, float m, float f){
+		
+			m_char = chr;
 			m_fase = p_fase;
-
-			RG.textFont(rFont, fsize);
-			m_shape = RG.getText(txt);
-			m_poly = RG.polygonize(m_shape);
-
-			if (m_poly.countChildren() < 1) return;
-			m_poly = m_poly.children[0];    
-
-			// Find the longest contour of our letter
-			float maxLength = 0.0f;
-			int maxIndex = -1;
-			for (int i = 0; i < m_poly.countPaths(); i++) {
-				float currentLength = m_poly.paths[i].getCurveLength();
-				if (currentLength > maxLength) {
-					maxLength = currentLength;
-					maxIndex = i;
-				}
-			}
-
-			if (maxIndex == -1) return;
-
-			RPoint[] points = m_poly.paths[maxIndex].getPoints();
-
-			for (int i=0; i<points.length; i++) {
-				this.vertex(points[i].x, points[i].y);
-			}
-
-			this.setFill(235, 235, 235);
-			this.setNoStroke();
-
-			this.setDamping( 0.1f);
-			this.setFriction(0.9f);
-			//this.setRestitution(0.5);
-			this.setSensor(true);
-			//this.setPosition(posX+10, height/5);
-			if (m_fase != 0)
-				this.setStatic(true); 
-
-			//posX = (posX + m_poly.getWidth()) % (width-100);
-
-			m_bodyCreated = true;
+			
+			m_mass = m;
+			m_friction = f;
+			m_X = x;
+			m_Y = y;
+			
+			m_accelX = 0.0f;
+			m_accelY = 0.0f;
+			
+		}
+		
+		public void setFriction (float f) {
+			m_friction = f;
 		}
 
-		boolean bodyCreated(){
-			return m_bodyCreated;  
+		public void setForce (float x, float y) {
+			
+			m_forceX = x;
+			m_forceY = y;
 		}
+		
+		public void draw(){
+			
+			m_accelX = m_accelX + ( m_forceX / m_mass ) *  m_friction;
+			m_velX = m_velX + m_accelX;
+			m_X = m_X + m_velX;
+			
+			m_accelY = m_accelY + ( m_forceY / m_mass ) *  m_friction;
+			m_velY = m_velY + m_accelY;
+			m_Y = m_Y + m_velY;
+			
+			text (m_char, m_X, m_Y);
 
-		public void draw(PGraphics applet){
-			preDraw(applet);
-			m_shape.draw(applet);
-			postDraw(applet);
 		}
 	}
 
