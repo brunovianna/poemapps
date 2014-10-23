@@ -23,9 +23,8 @@ public class Sopro extends PApplet {
 	ArrayList<FChar> world;
 	double sopro = 0;
 
-	StringList frase;
-	int[] fases;
-	int fase;
+	StringList frase, fases;
+	int fase =0;
 
 
 	//String frase = "frase para soprar um pouco mais longa até";
@@ -40,6 +39,8 @@ public class Sopro extends PApplet {
 	boolean measuring_sound = true;
 	float sound_threshold = 0;
 	int millis;
+
+	boolean wait_fase = false;
 	
 	public void setup() {
 		smooth();
@@ -52,39 +53,16 @@ public class Sopro extends PApplet {
 		CharSequence[] sopro_fases = res.getTextArray(R.array.sopro_fases);
 		
 		frase = new StringList();
-		
 		for (int i=0; i<sopro_texto.length;i++) {
-			frase.append (sopro_texto[i].toString());
+			frase.append (sopro_texto[i].toString());	
 		}
 		
-		//frase.append("guelra palavra");
-		/*frase.append("dentro dela o ar");
-		  frase.append("entrando e saindo");
-		  frase.append("expirar inspirar");
-		  frase.append("colocar uma palavra fora d’agua");
-		  frase.append("nas entre le / r / tras");
-		  
-		  frase.append("a palavra respira os sentidos que");
-		  frase.append("ainda vêm");
-		  frase.append("não é uma guerra");
-		  frase.append("mas uma outra espécie de paz");
-		  frase.append("a palavra erra");
-		  frase.append("quando diz mais");
+		fases = new StringList();
+		for (int i=0; i<sopro_fases.length;i++) {
+			fases.append (sopro_fases[i].toString());	
+		}
 		
-		  frase = new StringList();
-		frase.append("guelra palavra");
-		frase.append("dentro dela o ar");
-		  frase.append("entrando e saindo");
-		  frase.append("expirar inspirar");
-		  frase.append("colocar uma palavra fora d’agua");
-		  frase.append("nas entre le / r / tras");
-		  frase.append("a palavra respira os sentidos que");
-		  frase.append("ainda vêm");
-		  frase.append("não é uma guerra");
-		  frase.append("mas uma outra espécie de paz");
-		  frase.append("a palavra erra");
-		  frase.append("quando diz mais");*/
-
+		
 		String stringFont = "LiberationSerif-Bold";
 
 		PFont pFont = loadFont(stringFont+".vlw");
@@ -112,8 +90,8 @@ public class Sopro extends PApplet {
 				if (frase.get(i).charAt(j) != ' ') {
 					float pos_X =  textWidth(frase.get(i).substring( 0, j));
 					float mass = 1.0f + random (100)/1000.0f;
-					float friction = 0.9f;
-					FChar chr = new FChar(frase.get(i).charAt(j), fsize, start_X+ pos_X, pos_Y, mass, friction);
+					float friction = 0.1f;
+					FChar chr = new FChar(frase.get(i).charAt(j), start_X+ pos_X, pos_Y, mass, friction, fases.get(i).charAt(j));
 					println (frase.get(i).charAt(j));
 
 
@@ -136,6 +114,10 @@ public class Sopro extends PApplet {
 
 	public	void draw() {
 		
+		if (wait_fase)
+			if (millis + 2000 < millis()) 
+				wait_fase = false;
+		
 		if (measuring_sound) {
 			sound_counter++;
 			sound_sum += sopro;
@@ -146,7 +128,10 @@ public class Sopro extends PApplet {
 				measuring_sound = false;
 			}
 				
-		} else {
+		} 
+		
+		
+		if ((!measuring_sound)&&(!wait_fase)){
 		
 		
 		background(50);
@@ -154,10 +139,17 @@ public class Sopro extends PApplet {
 		stroke(0);
 
 		
+		boolean change_fase = true;
 		Iterator itr = world.iterator();
 		while (itr.hasNext()) {
 			FChar chr = (FChar) itr.next();
-			if (sopro > sound_threshold) {
+
+			if ((chr.m_X>0.0f)&&(chr.m_Y>0.0)&&(chr.m_X< width)) 
+				if ((int)(chr.m_fase) - 48 == fase )
+					change_fase = false;
+			
+			if (sopro > sound_threshold)
+				if ((int)(chr.m_fase) - 48 == fase) {
 				//vetor unitario
 				
 				// sopro vem do meio de baixo
@@ -166,11 +158,28 @@ public class Sopro extends PApplet {
 
 				float uvector = dist (0,0,ux,uy);
 
-				chr.setForce((float)((ux/uvector)*(sopro/sound_threshold)*0.00001f),(float)((uy/uvector)*(sopro/sound_threshold)*0.00001f));
+				chr.setForce((float)((ux/uvector)*(sopro/sound_threshold)*0.01f),(float)((uy/uvector)*(sopro/sound_threshold)*0.01f));
+			} else {
+				println ("aki");
 			}
 			
+
+			
 			chr.draw();
-		}
+				
+
+		
+			}
+		
+			if (change_fase) {
+				if (fase == 4) {
+					// end
+				} else {
+					fase++;
+					wait_fase = true;
+					millis = millis();
+				}
+			}
 		}
 
 	}
@@ -212,12 +221,12 @@ public class Sopro extends PApplet {
 	class FChar {
 
 		public int m_fase;
-		public char m_char;
+		public Character m_char;
 		float m_friction, m_accelX, m_accelY;
 		float m_X, m_Y, m_velX, m_velY, m_forceX, m_forceY, m_mass;
 		boolean m_static;
 		
-		FChar(char chr, int p_fase, float x, float y, float m, float f){
+		FChar(char chr, float x, float y, float m, float f, char p_fase){
 		
 			m_char = chr;
 			m_fase = p_fase;
@@ -244,11 +253,11 @@ public class Sopro extends PApplet {
 		
 		public void draw(){
 			
-			m_accelX = m_accelX + ( m_forceX / m_mass ) *  m_friction;
+			m_accelX =  ( m_forceX / m_mass ) - m_velX *  m_friction;
 			m_velX = m_velX + m_accelX;
 			m_X = m_X + m_velX;
 			
-			m_accelY = m_accelY + ( m_forceY / m_mass ) *  m_friction;
+			m_accelY =  ( m_forceY / m_mass ) - m_velY *  m_friction;
 			m_velY = m_velY + m_accelY;
 			m_Y = m_Y + m_velY;
 			
