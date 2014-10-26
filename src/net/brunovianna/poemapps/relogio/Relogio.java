@@ -34,15 +34,19 @@ public class Relogio extends PApplet {
 
 		background(200);
 		
-		pushMatrix();
 		translate (width/2 , height/2 ); 
 		scale(proporcao);
-		rotate ( second() *  PI / 30 );
+		rotate (second() *  PI / 30 - HALF_PI);
 		image (ponteiro_segundos, - zero_x,- zero_y);
-		rotate ( -second() *  PI / 30 );
-		rotate (minute() * PI / 30);
+		
+		
+		rotate ( -second() *  PI / 30 + HALF_PI );
+		
+		rotate (minute() * PI / 30 - HALF_PI);
 		image (ponteiro_minutos, - zero_x,- zero_y);
-		rotate (-minute() * PI / 30);
+		
+		rotate (-minute() * PI / 30 - HALF_PI);
+	
 		
 		int hora;
 		if (hour() > 11)
@@ -50,12 +54,10 @@ public class Relogio extends PApplet {
 		else
 			hora = hour();
 		
-		rotate (hora * PI / 6);
+		rotate (hora * PI / 6 +HALF_PI);
 		image (ponteiro_horas, - zero_x,- zero_y);
+		rotate (-hora * PI / 6 -HALF_PI);
 
-	
-		
-		imageMode(CENTER);
 		
 		int hora_anterior;
 		if (hora == 0)
@@ -63,12 +65,10 @@ public class Relogio extends PApplet {
 		else 
 			hora_anterior = hora - 1;
 			
-		rotate (-hora * PI / 6);
-		image(frases[hora_anterior],0,0);		
-		rotate (hora * PI / 6);
-		image(frases[hora],0,0);
-	
-		popMatrix();
+		image(frases[hora_anterior],-frases[hora_anterior].width/2 , -frases[hora_anterior].height/2);		
+		rotate (hora * PI / 6 + PI);
+		image(frases[hora],-frases[hora].width/2,-frases[hora].height/2);
+		
 
 		
 		
