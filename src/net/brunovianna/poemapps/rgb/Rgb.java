@@ -19,14 +19,16 @@ int downX, downY, halfWidth, halfHeight;
 double angle = 0;
 
 PGraphics buf; 
+//PShape rodashape;
 
 public void setup() {
   //size(100,100);
   //droidFont = createFont("DroidSans", 32, true);
 	
 	texto = loadImage("rgb-texto.png");
-	roda = loadImage("rgb-roda.png");
-
+	roda = loadImage("rgb-rodacompleta.png");
+	//rodashape = loadShape("rgb-rodavetorial.svg");
+	
 	buf = createGraphics(roda.height*2,roda.width*2,JAVA2D);
 
 	
@@ -37,6 +39,9 @@ public void setup() {
   //image (b,width/2,0);
   dragging = false;
   draggingRed = false;
+  
+  angle = 0;
+  
 }
 
 public void draw () {
@@ -46,38 +51,48 @@ public void draw () {
 	float proporcao = (float) ((float)displayWidth / (float)roda.width);
 	
 	if (dragging) {
+
+		int direction;
+		double delta_phi;
+		delta_phi = dist (mouseX, mouseY, downX, downY) / 600.0f * 2.0f * Math.PI;
+
+		if (downY > height/2) {
+			if (mouseX>downX) 
+				direction = -1;
+			 else
+				direction = 1;
+		} else {
+			if (mouseX>downX) 
+				direction = 1;
+			 else
+				direction = -1;
+		}
+			
+			
+		delta_phi *= direction;
 		
-		angle = dist (mouseX, mouseY, downX, downY) / 600.0f * 2.0f * Math.PI;
+		angle = delta_phi;
 		
 	}
 	
 	
 	//image (fora, (displayWidth-fora.width)/2, (displayHeight- fora.height)/2, displayWidth, displayWidth);
-	image (texto, 0, halfHeight-texto.height*proporcao/2, displayWidth, texto.height*proporcao);
+	image (texto, 0, halfHeight-texto.height*proporcao/2, width, texto.height*proporcao);
 
-	
 	buf.beginDraw();
 	buf.imageMode(CENTER);
 	buf.pushMatrix();
 	buf.translate(roda.width/2,roda.height/2);
 	buf.rotate((float) angle);
-	buf.image(roda,0,0);
+	buf.image(roda,0,0, roda.width, roda.height);
+	//buf.shapeMode(CENTER);
+	//buf.shape(rodashape,0,0);
 	buf.popMatrix();
 	buf.endDraw();
 	
-	/*
-	pushMatrix();
-	translate (halfWidth, halfHeight);
-	rotate((float) angle);
-
-	translate (-halfWidth, -halfHeight);
-
-	float largura = texto.width * proporcao;
-	float altura = texto.height * proporcao;
-	*/
-    blend (buf,0,0,roda.width,roda.height,0,(int)(halfHeight-texto.height*proporcao/2),(int) displayWidth, (int)(texto.height*proporcao),SUBTRACT);
+    blend (buf,0,0,roda.width,roda.height,0,(height-width)/2,width,width,SUBTRACT);
+    //blend (buf,0,0,roda.width,roda.height,0,(int)(halfHeight-texto.height*proporcao/2),(int) displayWidth, (int)(texto.height*proporcao),SUBTRACT);
 	//image (roda, (displayWidth-largura)/2, (displayHeight- altura)/2, largura, altura);
-	//popMatrix();
 
 	/*
   	if (!dragging)  {

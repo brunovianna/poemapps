@@ -36,28 +36,15 @@ public class Relogio extends PApplet {
 		
 		translate (width/2 , height/2 ); 
 		scale(proporcao);
-		rotate (second() *  PI / 30 - HALF_PI);
-		image (ponteiro_segundos, - zero_x,- zero_y);
 		
-		
-		rotate ( -second() *  PI / 30 + HALF_PI );
-		
-		rotate (minute() * PI / 30 - HALF_PI);
-		image (ponteiro_minutos, - zero_x,- zero_y);
-		
-		rotate (-minute() * PI / 30 - HALF_PI);
-	
 		
 		int hora;
 		if (hour() > 11)
-			hora = hour() - 12;
+			hora = (hour() - 12);
 		else
-			hora = hour();
+			hora = hour() ;
 		
-		rotate (hora * PI / 6 +HALF_PI);
-		image (ponteiro_horas, - zero_x,- zero_y);
-		rotate (-hora * PI / 6 -HALF_PI);
-
+		
 		
 		int hora_anterior;
 		if (hora == 0)
@@ -65,12 +52,45 @@ public class Relogio extends PApplet {
 		else 
 			hora_anterior = hora - 1;
 			
-		image(frases[hora_anterior],-frases[hora_anterior].width/2 , -frases[hora_anterior].height/2);		
-		rotate (hora * PI / 6 + PI);
-		image(frases[hora],-frases[hora].width/2,-frases[hora].height/2);
-		
 
+		//rotate (hora * PI / 6 + PI);
+		//image(frases[10],-frases[10].width/2,-frases[hora].height/2);
 		
+		
+		
+		PGraphics buf;
+		buf = createGraphics(frases[11].width,frases[11].height,JAVA2D);
+		buf.beginDraw(); 
+		//buf.rotate(PI);
+		buf.imageMode(CENTER);
+		buf.image(frases[11],frases[11].width/2,frases[11].height/2);
+		buf.fill (200);
+		buf.noStroke();
+		buf.arc(frases[11].width/2,frases[11].height/2, frases[11].width, frases[11].width,(minute()-1) * PI / 30 - HALF_PI,  TWO_PI-HALF_PI,PIE);  
+		buf.endDraw();
+		
+		image(buf,-frases[11].width/2,-frases[11].height/2);
+		
+		rotate((minute()-1) * PI / 30 );
+		image(frases[10],-frases[10].width/2 , -frases[10].height/2);		
+		rotate((-minute()+1) * PI / 30 );
+		
+		
+		rotate ((second() -1)*  PI / 30 - HALF_PI);
+		image (ponteiro_segundos, - zero_x,- zero_y);
+		
+		
+		rotate ( (-second() +1) *  PI / 30 + HALF_PI );
+		
+		rotate ((minute()-1) * PI / 30 - HALF_PI);
+		image (ponteiro_minutos, - zero_x,- zero_y);
+		
+		rotate ((-minute()+1) * PI / 30 - HALF_PI);
+	
+		rotate (hora * PI / 6 +HALF_PI);
+		image (ponteiro_horas, - zero_x,- zero_y);
+		rotate (-hora * PI / 6 -HALF_PI);
+
 		
 	}
 	

@@ -25,6 +25,8 @@ import android.widget.Button;
 
 public class DoubletJogoActivity extends PApplet {
 
+	Resources res;
+	
 	String primeira;
 	ArrayList<String> dicionario = new ArrayList<String> ();
 	ArrayList<String> possiveis = new ArrayList<String> ();
@@ -61,7 +63,8 @@ public class DoubletJogoActivity extends PApplet {
 	@SuppressLint("NewApi")
 	public void setup() {
 
-
+		res = getResources();
+		
 		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 		currentDoublet = settings.getInt("currentDoublet", 0);
 
@@ -125,20 +128,20 @@ public class DoubletJogoActivity extends PApplet {
 						if (possiveis.contains(doublets.get(currentDoublet).fim)) {
 
 							intent = new Intent (this, DoubletEndGameActivity.class);
-							intent.putExtra("mensagem", "você acertou!");
+							intent.putExtra("mensagem", res.getText(  R.string.notificacao_doublet_ganhou));
 							startActivityForResult(intent, OPCAO_FIM_DE_JOGO);
 
 						} else {
 
 							intent = new Intent (this, DoubletEndGameActivity.class);
-							intent.putExtra("mensagem", "tente outra vez!");
+							intent.putExtra("mensagem",res.getText( R.string.notificacao_doublet_perdeu));
 							startActivityForResult(intent, OPCAO_FIM_DE_JOGO);
 						}
 
 				// se nao tem nenhuma palavra, perdeu tambem
 				} else {
 					Intent intent = new Intent (this, DoubletEndGameActivity.class);
-					intent.putExtra("mensagem", "tente outra vez!");
+					intent.putExtra("mensagem", res.getText(R.string.notificacao_doublet_perdeu));
 					startActivityForResult(intent, OPCAO_FIM_DE_JOGO);
 
 					
@@ -275,7 +278,6 @@ public class DoubletJogoActivity extends PApplet {
 	
 	public void preparePoem() {
 		
-		Resources res = getResources();
 
 		doublets_array = res.getTextArray(R.array.doublets_array);
 
@@ -328,7 +330,7 @@ public class DoubletJogoActivity extends PApplet {
 			Intent data) {
 		if (requestCode == OPCAO_FIM_DE_JOGO) {
 			if (resultCode == JOGAR_NOVAMENTE) {
-
+				restart();
 			} else if (resultCode == NOVO_JOGO) {
 				palavras = new ArrayList<String> ();
 				indexLinha = 0;
